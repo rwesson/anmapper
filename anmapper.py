@@ -77,6 +77,10 @@ for pixelfile in pixelfiles:
         for j in range(nresults):
             resultsmap[j][x][y]=resultstable[j][1]
 
+# remove all negative values from lines image
+
+linesmap=numpy.where(linesmap<0,0,linesmap)
+
 # write the files
 
 print "writing file..."
