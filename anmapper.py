@@ -70,7 +70,11 @@ for pixelfile in pixelfiles:
     if maplines:
         linestable=hdus["LINES"].data
         for j in range(nlines):
-            linesmap[j][x][y]=linestable[j][2]
+            try:
+                linesmap[j][x][y]=linestable[j][2]
+            except:
+                print pixelfile
+                continue
 
     if mapresults:
         resultstable=hdus["RESULTS"].data
