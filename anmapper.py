@@ -38,6 +38,9 @@ try:
     table=hdu["LINES"].data
     nlines=len(table)
     linesmap=numpy.zeros(shape=(nlines,max(xpix)+1,max(ypix)+1))
+    wlenlist=table["WlenRest"]
+    ionlist=table["Ion"]
+    linelist=[ionlist[x]+" "+str(wlenlist[x]) for x in range(len(ionlist))]
 except:
     print("no lines")
     nlines=0
@@ -47,6 +50,7 @@ try:
     table=hdu["RESULTS"].data
     nresults=len(table)
     resultsmap=numpy.zeros(shape=(nresults,max(xpix)+1,max(ypix)+1))
+    resultlist=table["Quantity"]
 except:
     print("no results")
     nresults=0
@@ -89,7 +93,15 @@ linesmap=numpy.where(linesmap<0,0,linesmap)
 
 print("writing file...")
 if maplines:
-    fits.writeto("linemap.fits",linesmap,overwrite=True)
+    hdulist=fits.HDUList()
+    for i in range(len(linelist)):
+        hdu=fits.ImageHDU(linesmap[i][:][:],name=str(linelist[i]))
+        hdulist.append(hdu)
+    hdulist.writeto("linemap.fits",overwrite=True)
 
 if mapresults:
-    fits.writeto("resultmap.fits",resultsmap,overwrite=True)
+    hdulist=fits.HDUList()
+    for i in range(len(resultlist)):
+        hdu=fits.ImageHDU(resultsmap[i][:][:],name=str(resultlist[i]))
+        hdulist.append(hdu)
+    hdulist.writeto("resultmap.fits",overwrite=True)
