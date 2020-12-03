@@ -15,10 +15,10 @@ from astropy.io import fits
 
 pixelfiles=glob.glob("./*_*_*_fit.fits")
 if len(pixelfiles)==0:
-    print "no files"
+    print("no files")
     sys.exit()
 else:
-    print "mapping "+str(len(pixelfiles))+" pixels..."
+    print("mapping "+str(len(pixelfiles))+" pixels...")
 # get the dimensions
 
 xpix=[]
@@ -39,7 +39,7 @@ try:
     nlines=len(table)
     linesmap=numpy.zeros(shape=(nlines,max(xpix)+1,max(ypix)+1))
 except:
-    print "no lines"
+    print("no lines")
     nlines=0
     maplines=False
 
@@ -48,7 +48,7 @@ try:
     nresults=len(table)
     resultsmap=numpy.zeros(shape=(nresults,max(xpix)+1,max(ypix)+1))
 except:
-    print "no results"
+    print("no results")
     nresults=0
     mapresults=False
 
@@ -56,7 +56,7 @@ hdu.close()
 
 # get the fluxes
 
-print "mapping "+str(nlines)+" lines and "+str(nresults)+" quantities..."
+print("mapping "+str(nlines)+" lines and "+str(nresults)+" quantities...")
 
 i=0
 for pixelfile in pixelfiles:
@@ -73,7 +73,7 @@ for pixelfile in pixelfiles:
             try:
                 linesmap[j][x][y]=linestable[j][2]
             except:
-                print pixelfile
+                print(pixelfile)
                 continue
 
     if mapresults:
@@ -87,7 +87,7 @@ linesmap=numpy.where(linesmap<0,0,linesmap)
 
 # write the files
 
-print "writing file..."
+print("writing file...")
 if maplines:
     fits.writeto("linemap.fits",linesmap,overwrite=True)
 
