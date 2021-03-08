@@ -10,6 +10,7 @@ import math
 import numpy
 import sys
 from astropy.io import fits
+from astropy.wcs import WCS
 
 # get files
 
@@ -19,14 +20,35 @@ if len(pixelfiles)==0:
     sys.exit()
 else:
     print("mapping "+str(len(pixelfiles))+" pixels...")
-# get the dimensions
+
+header=fits.getheader(pixelfiles[0])
+
+# find original filename
+
+history="".join(header["history"]).split(" ")
+for s in history:
+  if ".fits" in s:
+    original=s
+    break
+
+# temp hack
+
+original="../"+original
+
+# get WCS
+
+hdu = fits.open(original)[1].header
+wcs = WCS(hdu).celestial # Import the WCS header
+hdr = wcs.to_header()
+
+# get the dimensions. filenames have y coordinate first
 
 xpix=[]
 ypix=[]
 
 for pixelfile in pixelfiles:
-    xpix.append(int(pixelfile.split("_")[-3]))
-    ypix.append(int(pixelfile.split("_")[-2]))
+    xpix.append(int(pixelfile.split("_")[-2])-1)
+    ypix.append(int(pixelfile.split("_")[-3])-1)
 
 # work out what to map
 
@@ -95,13 +117,13 @@ print("writing file...")
 if maplines:
     hdulist=fits.HDUList()
     for i in range(len(linelist)):
-        hdu=fits.ImageHDU(linesmap[i][:][:],name=str(linelist[i]))
+        hdu=fits.ImageHDU(linesmap[i][:][:],header=hdr,name=str(linelist[i]))
         hdulist.append(hdu)
     hdulist.writeto("linemap.fits",overwrite=True)
 
 if mapresults:
     hdulist=fits.HDUList()
     for i in range(len(resultlist)):
-        hdu=fits.ImageHDU(resultsmap[i][:][:],name=str(resultlist[i]))
+        hdu=fits.ImageHDU(resultsmap[i][:][:],header=hdr,name=str(resultlist[i]))
         hdulist.append(hdu)
     hdulist.writeto("resultmap.fits",overwrite=True)
