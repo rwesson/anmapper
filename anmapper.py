@@ -3,13 +3,21 @@
 # this is a script to turn ALFA and NEAT FITS output into image maps
 # rw@nebulousresearch.org
 # License: GPL v3
+# todo: add --no-wcs option in case original file not available
+#       handle case when section of original file was analysed
 
+import argparse
 import glob
 import math
 import numpy
+import os
 import sys
 from astropy.io import fits
 from astropy.wcs import WCS
+
+parser = argparse.ArgumentParser(description="Create line and physical parameter maps from ALFA or ALFA+NEAT analysis of data cubes")
+parser.add_argument("--original", default=None, required=False, help="FITS file originally analysed", nargs=1, dest="original")
+args = parser.parse_args()
 
 # get files
 
@@ -22,23 +30,33 @@ else:
 
 header=fits.getheader(pixelfiles[0])
 
-# find original filename
+# original file from command line if specified, otherwise try to get it from the header
 
-history="".join(header["history"]).split(" ")
-for s in history:
-  if ".fits" in s:
-    original=s
-    break
+if args.original:
+  original=args.original[0]
 
-# temp hack
+else:
+  original=""
+  history="".join(header["history"]).split(" ")
 
-original="../"+original
+  for s in history:
+    if ".fits" in s:
+      original=s
+      break
 
-# get WCS
+  if original=="":
+    print("couldn't deduce original file from header information. specify with --original")
+    sys.exit()
 
-hdu = fits.open(original)[1].header
-wcs = WCS(hdu).celestial # Import the WCS header
-hdr = wcs.to_header()
+# if the original file exists, get the WCS
+
+try:
+  hdu = fits.open(original)[1].header
+  wcs = WCS(hdu).celestial # Import the WCS header
+  hdr = wcs.to_header()
+except:
+  print("original file "+original+" not found. specify with --original")
+  sys.exit()
 
 # get the dimensions. filenames have y coordinate first
 
