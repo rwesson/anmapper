@@ -116,8 +116,9 @@ print("writing file...")
 if maplines:
     hdulist=fits.HDUList()
     for i in range(len(linelist)):
-        hdu=fits.ImageHDU(linesmap[i][:][:],header=hdr,name=str(linelist[i]))
-        hdulist.append(hdu)
+        if numpy.any(linesmap[i]>0):
+          hdu=fits.ImageHDU(linesmap[i][:][:],header=hdr,name=str(linelist[i]))
+          hdulist.append(hdu)
     hdulist.writeto("linemap.fits",overwrite=True)
 
 if mapresults:
