@@ -2,7 +2,6 @@
 
 # this is a script to turn ALFA and NEAT FITS output into image maps
 # rw@nebulousresearch.org
-# todo: copy WCS from input FITS
 # License: GPL v3
 
 import glob
