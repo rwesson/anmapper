@@ -12,6 +12,7 @@ import math
 import numpy
 import os
 import sys
+import tqdm
 from astropy.io import fits
 from astropy.wcs import WCS
 
@@ -105,7 +106,7 @@ hdu.close()
 print("mapping "+str(nlines)+" lines and "+str(nresults)+" quantities...")
 
 i=0
-for pixelfile in pixelfiles:
+for pixelfile in tqdm.tqdm(pixelfiles):
 
     x=xpix[i]
     y=ypix[i]
