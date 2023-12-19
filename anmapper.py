@@ -17,13 +17,16 @@ from astropy.wcs import WCS
 
 parser = argparse.ArgumentParser(description="Create line and physical parameter maps from ALFA or ALFA+NEAT analysis of data cubes")
 parser.add_argument("--original", default=None, required=False, help="FITS file originally analysed", nargs=1, dest="original")
+parser.add_argument("directory", nargs="?", default="./", help="Directory containing output files from ALFA/NEAT")
+parser.add_argument("--prefix", default="", required=False, help="prefix for output file names")
+
 args = parser.parse_args()
 
 # get files
 
-pixelfiles=glob.glob("./*_*_*_fit.fits")
+pixelfiles=glob.glob(args.directory+"/*_*_*_fit.fits")
 if len(pixelfiles)==0:
-    print("no files")
+    print("no files found in "+args.directory)
     sys.exit()
 else:
     print("mapping "+str(len(pixelfiles))+" pixels...")
@@ -137,11 +140,11 @@ if maplines:
         if numpy.any(linesmap[i]>0):
           hdu=fits.ImageHDU(linesmap[i][:][:],header=hdr,name=str(linelist[i]))
           hdulist.append(hdu)
-    hdulist.writeto("linemap.fits",overwrite=True)
+    hdulist.writeto(args.prefix+"linemap.fits",overwrite=True)
 
 if mapresults:
     hdulist=fits.HDUList()
     for i in range(len(resultlist)):
         hdu=fits.ImageHDU(resultsmap[i][:][:],header=hdr,name=str(resultlist[i]))
         hdulist.append(hdu)
-    hdulist.writeto("resultmap.fits",overwrite=True)
+    hdulist.writeto(args.prefix+"resultmap.fits",overwrite=True)
