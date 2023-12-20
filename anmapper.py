@@ -20,6 +20,8 @@ parser = argparse.ArgumentParser(description="Create line and physical parameter
 parser.add_argument("--original", default=None, required=False, help="FITS file originally analysed", nargs=1, dest="original")
 parser.add_argument("directory", nargs="?", default="./", help="Directory containing output files from ALFA/NEAT")
 parser.add_argument("--prefix", default="", required=False, help="prefix for output file names")
+parser.add_argument("--lines-only",action='store_true',required=False,help="Only make line maps, not result maps")
+parser.add_argument("--results-only",action='store_true',required=False,help="Only make result maps, not line maps")
 
 args = parser.parse_args()
 
@@ -100,6 +102,15 @@ except:
     mapresults=False
 
 hdu.close()
+
+# apply mapping options
+
+if args.lines_only and args.results_only:
+  print("--lines-only and --results-only are mutually exclusive (obvs)")
+  sys.exit()
+else:
+  maplines=maplines and not args.results_only
+  mapresults=mapresults and not args.lines_only
 
 # get the fluxes
 
