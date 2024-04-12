@@ -131,7 +131,7 @@ for pixelfile in tqdm.tqdm(pixelfiles):
             try:
                 linesmap[j][x][y]=linestable[j][2]
             except:
-                print(pixelfile)
+#                print(pixelfile)
                 continue
 
     if mapresults:
@@ -145,8 +145,8 @@ linesmap=numpy.where(linesmap<0,0,linesmap)
 
 # write the files
 
-print("writing file...")
 if maplines:
+    print("writing file "+args.prefix+"linemap.fits...")
     hdulist=fits.HDUList()
     for i in range(len(linelist)):
         if numpy.any(linesmap[i]>0):
@@ -155,6 +155,7 @@ if maplines:
     hdulist.writeto(args.prefix+"linemap.fits",overwrite=True)
 
 if mapresults:
+    print("writing file "+args.prefix+"resultmap.fits...")
     hdulist=fits.HDUList()
     for i in range(len(resultlist)):
         hdu=fits.ImageHDU(resultsmap[i][:][:],header=hdr,name=str(resultlist[i]))
