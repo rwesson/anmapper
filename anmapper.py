@@ -114,7 +114,13 @@ else:
 
 # get the fluxes
 
-print("mapping "+str(nlines)+" lines and "+str(nresults)+" quantities...")
+infotext=[]
+if maplines:
+  infotext.append(str(nlines)+" lines")
+if mapresults:
+  infotext.append(str(nresults)+" quantities")
+
+print("mapping "+" and ".join(infotext)+"...")
 
 i=0
 for pixelfile in tqdm.tqdm(pixelfiles):
