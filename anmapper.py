@@ -27,7 +27,7 @@ args = parser.parse_args()
 
 # get files
 
-pixelfiles=glob.glob(args.directory+"/*_*_*_fit.fits")
+pixelfiles=glob.glob(args.directory+"/*pixel_*_*_fit.fits")
 if len(pixelfiles)==0:
     print("no files found in "+args.directory)
     sys.exit()
