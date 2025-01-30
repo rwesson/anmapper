@@ -16,7 +16,7 @@ import tqdm
 from astropy.io import fits
 from astropy.wcs import WCS
 
-parser = argparse.ArgumentParser(description="Create line and physical parameter maps from ALFA or ALFA+NEAT analysis of data cubes")
+parser = argparse.ArgumentParser(description="Create line and physical parameter maps from ALFA or ALFA+NEAT analysis of data cubes. Results are written to [PREFIX]linemap.fits and [PREFIX]resultmap.fits.")
 parser.add_argument("--original", default=None, required=False, help="FITS file originally analysed", nargs=1, dest="original")
 parser.add_argument("directory", nargs="?", default="./", help="Directory containing output files from ALFA/NEAT")
 parser.add_argument("--prefix", default="", required=False, help="prefix for output file names")
@@ -56,13 +56,15 @@ else:
 
 # if the original file exists, get the WCS
 
-try:
-  hdu = fits.open(original)[1].header
-  wcs = WCS(hdu).celestial # Import the WCS header
-  hdr = wcs.to_header()
-except:
+if not os.path.exists(original):
   print("original file "+original+" not found. specify with --original")
   sys.exit()
+
+print("taking WCS information from %s..."%original)
+
+hdu = fits.open(original)[0].header
+wcs = WCS(hdu).celestial # Import the WCS header
+hdr = wcs.to_header()
 
 # get the dimensions. filenames have y coordinate first
 
@@ -155,9 +157,12 @@ if maplines:
     print("writing file "+args.prefix+"linemap.fits...")
     hdulist=fits.HDUList()
     for i in range(len(linelist)):
-        if numpy.any(linesmap[i]>0):
-          hdu=fits.ImageHDU(linesmap[i][:][:],header=hdr,name=str(linelist[i]))
-          hdulist.append(hdu)
+        print("%s: %i pixels mapped out of %i"%(linelist[i],numpy.count_nonzero(linesmap[i]),len(pixelfiles)))
+#        if numpy.count_nonzero(linesmap[i])>0.8*len(pixelfiles):
+        hdu=fits.ImageHDU(linesmap[i][:][:],header=hdr,name=str(linelist[i]))
+        hdulist.append(hdu)
+#        else:
+#          print("didn't write extension for %s, more than 80%% non-zero"%linelist[i])
     hdulist.writeto(args.prefix+"linemap.fits",overwrite=True)
 
 if mapresults:
