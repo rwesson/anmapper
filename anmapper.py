@@ -62,9 +62,23 @@ if not os.path.exists(original):
 
 print("taking WCS information from %s..."%original)
 
-hdu = fits.open(original)[0].header
-wcs = WCS(hdu).celestial # Import the WCS header
-hdr = wcs.to_header()
+# search for a valid WCS
+
+validwcs=False
+origdata=fits.open(original)
+for ext in origdata:
+  if "CRPIX1" in ext.header:
+    wcs = WCS(ext.header).celestial
+    hdr = wcs.to_header()
+    print("found WCS in extension %s"%ext.name)
+    validwcs=True
+    break
+
+# fail if not found
+
+if not validwcs:
+  print("couldn't find a valid WCS")
+  sys.exit()
 
 # get the dimensions. filenames have y coordinate first
 
