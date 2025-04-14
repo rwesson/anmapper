@@ -25,6 +25,13 @@ parser.add_argument("--results-only",action='store_true',required=False,help="On
 
 args = parser.parse_args()
 
+def get_file():
+  hdulist=fits.HDUList()
+  primaryhdu=fits.PrimaryHDU(header=hdr)
+  primaryhdu.header["history"] = " ".join(sys.argv)
+  hdulist.append(primaryhdu)
+  return hdulist
+
 # get files
 
 pixelfiles=glob.glob(args.directory+"/*pixel_*_*_fit.fits")
@@ -166,12 +173,8 @@ for pixelfile in tqdm.tqdm(pixelfiles):
 linesmap=numpy.where(linesmap<0,0,linesmap)
 
 # write the files
-hdulist=fits.HDUList()
-primaryhdu=fits.PrimaryHDU(header=hdr)
-primaryhdu.header["history"] = " ".join(sys.argv)
-hdulist.append(primaryhdu)
-
 if maplines:
+    hdulist=get_file()
     print("writing file "+args.prefix+"linemap.fits...")
     for i in range(len(linelist)):
         print("%s: %i pixels mapped out of %i"%(linelist[i],numpy.count_nonzero(linesmap[i]),len(pixelfiles)))
@@ -183,6 +186,7 @@ if maplines:
     hdulist.writeto(args.prefix+"linemap.fits",overwrite=True)
 
 if mapresults:
+    hdulist=get_file()
     print("writing file "+args.prefix+"resultmap.fits...")
     for i in range(len(resultlist)):
         hdu=fits.ImageHDU(resultsmap[i][:][:],header=hdr,name=str(resultlist[i]))
