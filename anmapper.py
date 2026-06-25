@@ -184,6 +184,7 @@ if maplines:
 #        else:
 #          print("didn't write extension for %s, more than 80%% non-zero"%linelist[i])
     hdulist.writeto(args.prefix+"linemap.fits",overwrite=True)
+    print("wrote file %s"%args.prefix+"linemap.fits")
 
 if mapresults:
     hdulist=get_file()
@@ -192,3 +193,4 @@ if mapresults:
         hdu=fits.ImageHDU(resultsmap[i][:][:],header=hdr,name=str(resultlist[i]))
         hdulist.append(hdu)
     hdulist.writeto(args.prefix+"resultmap.fits",overwrite=True)
+    print("wrote file %s"%args.prefix+"resultmap.fits")
